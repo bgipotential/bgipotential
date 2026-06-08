@@ -847,108 +847,6 @@
     </div>
   </div>
 
-  <!-- Info toggle button -->
-  <button id="info-toggle-btn" title="About GIPI &mdash; methodology &amp; components">&#9432;</button>
-
-  <!-- Info Panel -->
-  <div id="info-panel">
-    <button class="close-info" id="btn-close-info" title="Close">&times;</button>
-
-    <h4>About the GIPI</h4>
-
-    <div class="info-section">
-      <div class="info-body">
-        The <strong>Green Infrastructure Potential Index (GIPI)</strong> is a geospatial composite index
-        developed for Nate Mestre&rsquo;s 2026 master&rsquo;s thesis at NYU. It uses
-        <strong>multi-criteria decision analysis</strong> to integrate high-resolution data on
-        flooding risk, extreme heat, and air pollution, ranking urban areas by their potential for introducing
-        environmentally sustainable blue and green infrastructure (BGI; bioswales, green roofs, urban
-        tree canopy, permeable pavement, etc.).
-        This interactive map only reflects <strong>city-wide GIPI averages and inter-city comparison</strong>
-        (benchmarking municipalities against one another) product of the thesis. The other product of the thesis,
-        <strong> intra-city GIPI mapping </strong>, that is,
-        mapping where BGI should best be implemented <i>within</i> a city, is not included in this map.
-        Ultimately, the project aims at assessing where US cities lie in their potential for BGI introduction,helping
-        planners move beyond
-        outdated gray infrastructure toward more resilient, sustainable urban environments adapted for a changing world
-      </div>
-    </div>
-
-    <div class="info-section">
-      <h5>Hydrological Component (HC)</h5>
-      <div class="eq-block">
-        <div class="eq-label">Eq. 1</div>
-        HC = 0.7 &middot; &radic;(Imperv &times; Precip) + 0.1 &middot; CSO + 0.2 &middot; Prkng
-      </div>
-      <ul class="var-list">
-        <li><strong>Imperv</strong> &mdash; Impervious surface fraction of the city (roads, rooftops, sidewalks). Higher
-          values mean more runoff.</li>
-        <li><strong>Precip</strong> &mdash; Precipitation estimate for a 2-year, 1-hour design storm (inches). Captures
-          acute flood risk.</li>
-        <li><strong>CSO</strong> &mdash; Combined Sewer Overflow presence in the city. Cities with combined sewers can
-          discharge raw
-          sewage during heavy rain.</li>
-        <li><strong>Prkng</strong> &mdash; Parking lot area as a share of the city&rsquo;s land. Large impervious lots
-          are prime candidates for green retrofit.</li>
-      </ul>
-      <div class="info-body" style="margin-top:6px;">
-        The dominant sub-component uses the <strong>geometric mean</strong> of imperviousness and precipitation
-        (square-root product), reflecting how flood risk emerges from the <em>interaction</em> of impervious cover
-        and storm intensity rather than either factor alone.
-      </div>
-    </div>
-
-    <div class="info-section">
-      <h5>Heat Severity Component (HS)</h5>
-      <div class="eq-block">
-        <div class="eq-label">Eq. 2</div>
-        HS = 0.5 &middot; HeatGeo + 0.5 &middot; AugT
-      </div>
-      <ul class="var-list">
-        <li><strong>HeatGeo</strong> &mdash; Urban Heat Island (UHI) intensity derived from land-surface temperature
-          differentials.
-          Measures how much hotter a location is relative to its non-urban surroundings. The <em>baseline
-            temperature</em>
-          is excluded so that the metric captures the UHI effect alone.</li>
-        <li><strong>AugT</strong> &mdash; August nighttime low temperature. Captures dangerous overnight heat exposure
-          that prevents
-          the human body from recovering, which is a key driver of heat-related mortality.</li>
-      </ul>
-      <div class="info-body" style="margin-top:6px;">
-        Both sub-components are weighted equally. <strong>HeatGeo</strong> isolates the local urban-heat amplification,
-        while <strong>AugT</strong> anchors results to actual observed extreme temperatures, ensuring
-        cities in hotter climates are appropriately flagged.
-      </div>
-    </div>
-
-    <div class="info-section">
-      <h5>Air Quality Component (AQ)</h5>
-      <div class="info-body">
-        The Air Quality component is included as a <strong>raw dataset</strong> (no internal
-        sub-component aggregation). It comes from a CDC environmental justice dataset and is a percentile rank
-        consisting of # of exceedence days of ozone, PM2.5 concentrations, air toxics cancer risk, and diesel
-        particulate matter concentration. It
-        enters the final GIPI equation directly.
-      </div>
-    </div>
-
-    <div class="info-section">
-      <h5>Final GIPI Composite</h5>
-      <div class="eq-block">
-        <div class="eq-label">Eq. 3 &mdash; &ldquo;Classic&rdquo; GIPI</div>
-        GIPI = 0.6 &middot; HC + 0.3 &middot; HS + 0.1 &middot; AQ
-      </div>
-      <div class="info-body">
-        The <strong>&ldquo;Classic&rdquo; weight scheme</strong> (60 / 30 / 10) prioritizes
-        hydrological risk, which is the most actionable target for green infrastructure.
-        Heat severity receives secondary emphasis, while air quality serves as a
-        supplementary factor.
-      </div>
-    </div>
-
-
-  </div>
-
   <div id="gipi-legend">
     <h4>GIPI Rankings</h4>
     <div class="legend-sub">
@@ -1421,19 +1319,6 @@
 
       // ─── Initial render ───────────────────────────────────────────────────────
       applySliders();
-
-      // ─── Info panel toggle ────────────────────────────────────────────────────
-      const infoPanel = document.getElementById('info-panel');
-      const infoBtn = document.getElementById('info-toggle-btn');
-      const closeInfo = document.getElementById('btn-close-info');
-
-      infoBtn.addEventListener('click', () => {
-        const open = infoPanel.style.display === 'block';
-        infoPanel.style.display = open ? 'none' : 'block';
-      });
-      closeInfo.addEventListener('click', () => {
-        infoPanel.style.display = 'none';
-      });
 
       // ─── Ctrl-panel weight-info tooltip toggle ────────────────────────────────
       const ctrlInfoBtn = document.getElementById('ctrl-info-btn');
