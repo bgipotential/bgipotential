@@ -19,8 +19,7 @@
   <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css" />
 
-  <meta name="viewport" content="width=device-width,
-                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     #map_63dce5f1cec547c47feb65d0694faa86 {
       position: relative;
@@ -618,6 +617,173 @@
     #ctrl-info-tip em {
       color: #b0cad8;
     }
+
+    /* Responsive panel launchers (phones only) */
+    .mobile-panel-btn {
+      display: none;
+      position: fixed;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      z-index: 10001;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid rgba(63, 209, 200, 0.45);
+      border-radius: 22px;
+      background: rgba(30, 42, 56, 0.94);
+      color: #3fd1c8;
+      font: 800 10px/1 Inter, sans-serif;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, .35);
+    }
+
+    #mobile-weights-btn {
+      left: 12px;
+    }
+
+    #mobile-rankings-btn {
+      right: 12px;
+    }
+
+    @media (max-width: 1024px) {
+      #ctrl-panel {
+        left: 12px;
+        bottom: 16px;
+        width: min(290px, calc(50vw - 20px));
+        padding: 14px 16px 12px;
+      }
+
+      #gipi-legend {
+        right: 12px;
+        bottom: 16px;
+        max-height: min(48vh, 460px);
+      }
+
+      #title-banner {
+        width: min(680px, calc(100vw - 120px));
+        padding: 8px 16px;
+      }
+
+      #title-banner h1 {
+        font-size: 15px;
+      }
+
+      #info-toggle-btn {
+        top: 76px;
+        left: 12px;
+      }
+
+      #info-panel {
+        top: 76px;
+        left: 58px;
+        width: min(430px, calc(100vw - 70px));
+        max-height: calc(100dvh - 92px);
+      }
+    }
+
+    @media (max-width: 700px) {
+      #title-banner {
+        top: max(8px, env(safe-area-inset-top));
+        width: calc(100vw - 96px);
+        padding: 7px 10px;
+        border-radius: 10px;
+      }
+
+      #title-banner h1 {
+        font-size: 12px;
+        line-height: 1.2;
+        letter-spacing: .8px;
+      }
+
+      #title-banner p {
+        display: none;
+      }
+
+      #info-toggle-btn {
+        top: max(8px, env(safe-area-inset-top));
+        left: 8px;
+        width: 34px;
+        height: 34px;
+      }
+
+      #info-panel {
+        inset: max(50px, calc(env(safe-area-inset-top) + 50px)) 8px auto 8px;
+        width: auto;
+        max-height: calc(100dvh - 110px);
+        padding: 16px;
+      }
+
+      #ctrl-panel,
+      #gipi-legend {
+        display: none;
+        left: 8px;
+        right: 8px;
+        bottom: calc(max(12px, env(safe-area-inset-bottom)) + 52px);
+        width: auto;
+        max-height: calc(100dvh - 125px);
+        overflow-y: auto;
+      }
+
+      #ctrl-panel.mobile-open,
+      #gipi-legend.mobile-open {
+        display: block;
+      }
+
+      #ctrl-panel {
+        padding: 14px 16px 12px;
+      }
+
+      #gipi-legend {
+        top: auto;
+        padding: 12px 14px;
+      }
+
+      .mobile-panel-btn {
+        display: block;
+      }
+
+      .leaflet-control-zoom {
+        margin-top: 54px !important;
+      }
+
+      .leaflet-control-scale {
+        margin-bottom: 62px !important;
+      }
+
+      .leaflet-popup-content {
+        max-width: calc(100vw - 90px);
+      }
+
+      .leaflet-tooltip {
+        max-width: calc(100vw - 40px);
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 380px) {
+      #title-banner {
+        width: calc(100vw - 88px);
+      }
+
+      .mobile-panel-btn {
+        padding: 0 11px;
+        font-size: 9px;
+      }
+
+      .btn-row,
+      .btn-row-solo {
+        gap: 5px;
+      }
+    }
+
+    @media (max-height: 620px) and (min-width: 701px) {
+      #ctrl-panel,
+      #gipi-legend {
+        bottom: 10px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+      }
+    }
   </style>
 
   <div id="title-banner">
@@ -792,6 +958,11 @@
     </div>
     <div id="legend-rows"></div>
   </div>
+
+  <button class="mobile-panel-btn" id="mobile-weights-btn" type="button"
+    aria-controls="ctrl-panel" aria-expanded="false">Weights</button>
+  <button class="mobile-panel-btn" id="mobile-rankings-btn" type="button"
+    aria-controls="gipi-legend" aria-expanded="false">Rankings</button>
 
   <script>
     // ─── Data ────────────────────────────────────────────────────────────────────
@@ -1271,6 +1442,39 @@
       ctrlInfoBtn.addEventListener('click', () => {
         const open = ctrlInfoTip.style.display === 'block';
         ctrlInfoTip.style.display = open ? 'none' : 'block';
+      });
+
+      // Mobile panel launchers keep the map usable on narrow screens.
+      const mobileWeightsBtn = document.getElementById('mobile-weights-btn');
+      const mobileRankingsBtn = document.getElementById('mobile-rankings-btn');
+      const ctrlPanel = document.getElementById('ctrl-panel');
+      const legendPanel = document.getElementById('gipi-legend');
+
+      function toggleMobilePanel(panel, button, otherPanel, otherButton) {
+        const willOpen = !panel.classList.contains('mobile-open');
+        panel.classList.toggle('mobile-open', willOpen);
+        button.setAttribute('aria-expanded', String(willOpen));
+        otherPanel.classList.remove('mobile-open');
+        otherButton.setAttribute('aria-expanded', 'false');
+        setTimeout(() => leafletMap.invalidateSize(), 0);
+      }
+
+      mobileWeightsBtn.addEventListener('click', () => {
+        toggleMobilePanel(ctrlPanel, mobileWeightsBtn, legendPanel, mobileRankingsBtn);
+      });
+
+      mobileRankingsBtn.addEventListener('click', () => {
+        toggleMobilePanel(legendPanel, mobileRankingsBtn, ctrlPanel, mobileWeightsBtn);
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 700) {
+          ctrlPanel.classList.remove('mobile-open');
+          legendPanel.classList.remove('mobile-open');
+          mobileWeightsBtn.setAttribute('aria-expanded', 'false');
+          mobileRankingsBtn.setAttribute('aria-expanded', 'false');
+        }
+        leafletMap.invalidateSize();
       });
 
     });
